@@ -176,17 +176,6 @@ public:
     return optbit | 0x80;
   }
 
-private:
-  static constexpr uint64_t USB_VENDOR = 10473;
-  static constexpr uint64_t USB_PRODUCT = 649;
-
-  static constexpr uint64_t BULK_ENDPOINT_IN = 0x81;
-  static constexpr uint64_t BULK_ENDPOINT_OUT = 0x03;
-  static constexpr uint64_t TIMEOUT = 5000;
-
-  libusb_context *ctx = nullptr;
-  libusb_device_handle *dev_handle = nullptr;
-
   void cleanup() {
     if (dev_handle) {
       libusb_release_interface(dev_handle, 0);
@@ -199,6 +188,17 @@ private:
       ctx = nullptr;
     }
   }
+
+private:
+  static constexpr uint64_t USB_VENDOR = 10473;
+  static constexpr uint64_t USB_PRODUCT = 649;
+
+  static constexpr uint64_t BULK_ENDPOINT_IN = 0x81;
+  static constexpr uint64_t BULK_ENDPOINT_OUT = 0x03;
+  static constexpr uint64_t TIMEOUT = 5000;
+
+  libusb_context *ctx = nullptr;
+  libusb_device_handle *dev_handle = nullptr;
 };
 } // namespace em5820
 
