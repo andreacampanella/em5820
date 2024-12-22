@@ -1117,12 +1117,12 @@ int main() {
     Printer pos;
     pos.open_usb();
     pos.reset();
-    pos.set_allignment(Printer::Alignment::CENTER);
+    pos.set_alignment(Printer::Alignment::CENTER);
     pos.set_print_text_type(Printer::enable_bold(Printer::enable_underline(0)));
     pos.write_string("This is a test of my little printer");
     pos.reset();
 
-    pos.set_allignment(Printer::Alignment::CENTER);
+    pos.set_alignment(Printer::Alignment::CENTER);
     pos.print_bitmap(Printer::BitmapMode::NORMAL, 400, 265, bitmap_example);
     pos.reset();
     pos.feed_lines(2);

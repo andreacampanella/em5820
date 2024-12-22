@@ -129,7 +129,7 @@ public:
                         static_cast<uint8_t>(pos >> 8)});
   }
 
-  uint16_t set_allignment(Alignment allign) {
+  uint16_t set_alignment(Alignment allign) {
     return write_bytes({0x1b, 0x61, static_cast<uint8_t>(allign)});
   }
 
