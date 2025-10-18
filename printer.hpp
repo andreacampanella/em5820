@@ -4,6 +4,7 @@
 #include <libusb-1.0/libusb.h>
 #include <stdexcept>
 #include <vector>
+#include <unistd.h>  // for usleep
 
 namespace em5820 {
 
@@ -103,6 +104,52 @@ public:
     return transferred;
   }
 
+  // Print bitmap in batches of lines (much faster!)
+  uint16_t print_bitmap_lines(BitmapMode mode, uint16_t width, uint16_t height,
+                               const std::vector<uint8_t> &bitmap, 
+                               uint16_t lines_per_batch = 50) {
+      if (width % 8 != 0) {
+          throw std::runtime_error("Width must be multiple of 8");
+      }
+      
+      size_t bytes_per_line = width / 8;
+      uint16_t total_sent = 0;
+      uint16_t lines_remaining = height;
+      uint16_t current_line = 0;
+      
+      while (lines_remaining > 0) {
+          // Determine batch size
+          uint16_t batch_size = std::min(lines_per_batch, lines_remaining);
+          
+          // Send command for this batch
+          uint8_t width_first = bytes_per_line & 0x00ff;
+          uint8_t width_second = (bytes_per_line >> 8) & 0x00ff;
+          uint8_t height_first = batch_size & 0x00ff;
+          uint8_t height_second = (batch_size >> 8) & 0x00ff;
+          
+          std::vector<uint8_t> cmd{
+              0x1d, 0x76, 0x30, static_cast<uint8_t>(mode),
+              width_first, width_second, height_first, height_second
+          };
+          
+          total_sent += write_bytes(cmd);
+          
+          // Send batch of lines
+          size_t batch_bytes = batch_size * bytes_per_line;
+          std::vector<uint8_t> batch_data(
+              bitmap.begin() + (current_line * bytes_per_line),
+              bitmap.begin() + (current_line * bytes_per_line) + batch_bytes
+          );
+          
+          total_sent += write_bytes(batch_data);
+          
+          current_line += batch_size;
+          lines_remaining -= batch_size;
+      }
+      
+      return total_sent;
+  }
+
   uint16_t reset() { return write_bytes({0x1b, 0x40}); }
 
   uint16_t set_text_scale(uint8_t horizontal, uint8_t vertical) {
@@ -195,7 +242,7 @@ private:
 
   static constexpr uint64_t BULK_ENDPOINT_IN = 0x81;
   static constexpr uint64_t BULK_ENDPOINT_OUT = 0x03;
-  static constexpr uint64_t TIMEOUT = 5000;
+  static constexpr uint64_t TIMEOUT = 30000;
 
   libusb_context *ctx = nullptr;
   libusb_device_handle *dev_handle = nullptr;
