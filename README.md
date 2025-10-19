@@ -185,11 +185,6 @@ The driver implements the ESC/POS protocol used by most thermal receipt printers
 - Width must be multiple of 8 pixels (hardware requirement)
 - Each byte represents 8 horizontal pixels in bitmap format
 
-
-## 📄 License
-
-[Your License Here]
-
 ---
 
 <p align="center">Made with ❤️ for thermal printing enthusiasts</p>
