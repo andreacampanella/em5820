@@ -175,93 +175,6 @@ em5820/
 ├── stb_image.h          # Image loading library (download separately)
 └── README.md            # This file
 
-
----
-
-## 🎯 Examples
-
-### 🧾 Receipt Printer Script
-
-
-#!/bin/bash
-# receipt.sh
-
-echo "================================" | print --center
-echo "MY COFFEE SHOP" | print --center --bold --large
-echo "================================" | print --center
-echo "" | print
-echo "Date: \$(date '+%Y-%m-%d %H:%M')" | print --left
-echo "Barista: \$USER" | print --left
-echo "" | print
-echo "1x Cappuccino............ \$4.50" | print --left
-echo "1x Croissant............. \$3.00" | print --left
-echo "--------------------------------" | print --center
-echo "Total................... \$7.50" | print --right --bold
-echo "" | print
-echo "Thank you!" | print --center
-
-
-### 📊 System Monitor
-
-
-#!/bin/bash
-# sysmon.sh - Print system stats
-
-echo "SYSTEM STATUS" | sudo ./build/print_text --center --bold --large
-echo "" | sudo ./build/print_text
-uptime | sudo ./build/print_text --left
-df -h / | sudo ./build/print_text --left
-free -h | sudo ./build/print_text --left
-
-
-### 📸 Photo Booth
-
-
-#!/bin/bash
-# Take a photo and print it
-
-fswebcam -r 640x480 photo.jpg
-sudo ./build/print_image photo.jpg
-echo "\$(date)" | sudo ./build/print_text --center
-
-
----
-
-## 🔧 Troubleshooting
-
-### ❌ Permission Denied
-
-Add udev rule to allow non-root access:
-
-
-echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="28e9", ATTR{idProduct}=="0289", MODE="0666"' | \\
-  sudo tee /etc/udev/rules.d/99-em5820.rules
-sudo udevadm control --reload-rules
-
-
-Or add your user to the dialout group:
-
-
-sudo usermod -a -G dialout \$USER
-# Log out and back in
-
-
-### ⏱️ Timeout Errors
-
-If you get \`LIBUSB_ERROR_TIMEOUT\`, try:
-
-1. Reduce \`lines_per_batch\` in \`print_bitmap_lines()\` (default is 50)
-2. Increase \`TIMEOUT\` constant in \`printer.hpp\`
-3. Check USB cable quality
-
-### 🔀 Garbled Output
-
-- Verify printer is EM5820 model
-- Check USB Vendor ID (\`0x28e9\`) and Product ID (\`0x0289\`)
-- Ensure correct paper is loaded
-
----
-
 ## 🔬 Technical Details
 
 The driver implements the ESC/POS protocol used by most thermal receipt printers. Key technical points:
@@ -272,13 +185,6 @@ The driver implements the ESC/POS protocol used by most thermal receipt printers
 - Width must be multiple of 8 pixels (hardware requirement)
 - Each byte represents 8 horizontal pixels in bitmap format
 
----
-
-## 🙏 Credits
-
-This driver was created by reverse engineering the printer library code in \`PrinterLib.dll\` from the manufacturer. Special thanks to the [Adafruit thermal printer community](https://deathandthepenguinblog.wordpress.com/2019/12/08/adafruit-mini-thermal-printer-part-1-getting-better-pictures/) for dithering inspiration.
-
----
 
 ## 📄 License
 
